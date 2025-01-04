@@ -36,19 +36,12 @@ interface TooltipPayload {
 }
 
 interface CustomTooltipProps {
-  active?: boolean;
-  payload?: TooltipPayload[] | undefined;
-  label?: string;
-  isMonthly?: boolean;
-  separator?: string;
-  formatter?: (value: any) => [string | number, string];
-  contentStyle?: React.CSSProperties;
-  itemStyle?: React.CSSProperties;
-  labelStyle?: React.CSSProperties;
-  wrapperStyle?: React.CSSProperties;
-  cursor?: boolean | object;
-}
-
+    active?: boolean;
+    payload?: TooltipPayload[] | undefined;
+    label?: string;
+    isMonthly?: boolean;
+    color?: string;
+  }
 const generateWeeks = (): Week[] => {
   const weeks: Week[] = [];
   const startDate = new Date('2025-01-01');
@@ -80,38 +73,43 @@ const generateWeeks = (): Week[] => {
 const WEEKS = generateWeeks();
 const VISIBLE_WEEKS = 12;
 
-const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label, isMonthly }) => {
-  if (active && payload && payload.length) {
-    return (
-      <div className="bg-white p-4 border rounded shadow-lg">
-        <p className="font-medium">{label}</p>
-        {payload.map((entry, index) => (
-          <div key={index} className="mt-1">
-            <p style={{ color: entry.color }}>
-              {entry.name}: {entry.value > 0 ? '+' : ''}{entry.value}
-            </p>
-            {!isMonthly && entry.payload[`${entry.name}_note`] && (
-              <p className="text-gray-600 text-sm">
-                Note: {entry.payload[`${entry.name}_note`]}
+const CustomTooltip: React.FC<CustomTooltipProps> = ({ 
+    active, 
+    payload, 
+    label, 
+    isMonthly = false 
+  }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-white p-4 border rounded shadow-lg">
+          <p className="font-medium">{label}</p>
+          {payload.map((entry, index) => (
+            <div key={index} className="mt-1">
+              <p style={{ color: entry.color }}>
+                {entry.name}: {entry.value > 0 ? '+' : ''}{entry.value}
               </p>
-            )}
-            {isMonthly && entry.payload[`${entry.name}_notes`] && Array.isArray(entry.payload[`${entry.name}_notes`]) && (
-              <div className="text-gray-600 text-sm">
-                <p className="font-medium">Notes:</p>
-                <ul className="list-disc pl-4">
-                  {(entry.payload[`${entry.name}_notes`] as string[]).map((note: string, i: number) => (
-                    <li key={i}>{note}</li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-        ))}
-      </div>
-    );
-  }
-  return null;
-};
+              {!isMonthly && entry.payload[`${entry.name}_note`] && (
+                <p className="text-gray-600 text-sm">
+                  Note: {entry.payload[`${entry.name}_note`]}
+                </p>
+              )}
+              {isMonthly && entry.payload[`${entry.name}_notes`] && Array.isArray(entry.payload[`${entry.name}_notes`]) && (
+                <div className="text-gray-600 text-sm">
+                  <p className="font-medium">Notes:</p>
+                  <ul className="list-disc pl-4">
+                    {(entry.payload[`${entry.name}_notes`] as string[]).map((note: string, i: number) => (
+                      <li key={i}>{note}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
 
 interface Metric {
   name: string;

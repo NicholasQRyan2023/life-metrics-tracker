@@ -26,6 +26,29 @@ interface Week {
   end: Date;
 }
 
+interface TooltipPayload {
+  color: string;
+  name: string;
+  value: number;
+  payload: {
+    [key: string]: string | string[] | number | undefined;
+  };
+}
+
+interface CustomTooltipProps {
+  active?: boolean;
+  payload?: TooltipPayload[] | undefined;
+  label?: string;
+  isMonthly?: boolean;
+  separator?: string;
+  formatter?: (value: any) => [string | number, string];
+  contentStyle?: React.CSSProperties;
+  itemStyle?: React.CSSProperties;
+  labelStyle?: React.CSSProperties;
+  wrapperStyle?: React.CSSProperties;
+  cursor?: boolean | object;
+}
+
 const generateWeeks = (): Week[] => {
   const weeks: Week[] = [];
   const startDate = new Date('2025-01-01');
@@ -57,13 +80,6 @@ const generateWeeks = (): Week[] => {
 const WEEKS = generateWeeks();
 const VISIBLE_WEEKS = 12;
 
-interface CustomTooltipProps {
-  active?: boolean;
-  payload?: any[];
-  label?: string;
-  isMonthly?: boolean;
-}
-
 const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label, isMonthly }) => {
   if (active && payload && payload.length) {
     return (
@@ -79,11 +95,11 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({ active, payload, label, i
                 Note: {entry.payload[`${entry.name}_note`]}
               </p>
             )}
-            {isMonthly && entry.payload[`${entry.name}_notes`]?.length > 0 && (
+            {isMonthly && entry.payload[`${entry.name}_notes`] && Array.isArray(entry.payload[`${entry.name}_notes`]) && (
               <div className="text-gray-600 text-sm">
                 <p className="font-medium">Notes:</p>
                 <ul className="list-disc pl-4">
-                  {entry.payload[`${entry.name}_notes`].map((note: string, i: number) => (
+                  {(entry.payload[`${entry.name}_notes`] as string[]).map((note: string, i: number) => (
                     <li key={i}>{note}</li>
                   ))}
                 </ul>
@@ -166,12 +182,12 @@ const LifeMetricsTracker: React.FC = () => {
   
     interface MonthlyData {
       month: string;
-      [key: string]: any;
+      [key: string]: string | number | string[];
     }
   
     interface ChartData {
       week?: string;
-      [key: string]: any;
+      [key: string]: string | number | string[] | undefined;
     }
   
     const getChartData = (): (MonthlyData | ChartData)[] => {
@@ -191,11 +207,11 @@ const LifeMetricsTracker: React.FC = () => {
           metrics.forEach(metric => {
             const direction = metric.weeks[weekIndex];
             if (direction) {
-              if (direction === 'up') monthlyData[week.month][metric.name]++;
-              if (direction === 'down') monthlyData[week.month][metric.name]--;
+              if (direction === 'up') monthlyData[week.month][metric.name] = (monthlyData[week.month][metric.name] as number) + 1;
+              if (direction === 'down') monthlyData[week.month][metric.name] = (monthlyData[week.month][metric.name] as number) - 1;
             }
             if (metric.notes[weekIndex]) {
-              monthlyData[week.month][`${metric.name}_notes`].push(
+              (monthlyData[week.month][`${metric.name}_notes`] as string[]).push(
                 `Week ${week.weekNum}: ${metric.notes[weekIndex]}`
               );
             }
@@ -207,7 +223,7 @@ const LifeMetricsTracker: React.FC = () => {
       }
   
       const chartData: ChartData[] = [];
-      let lastKnownValues = Object.fromEntries(metrics.map(m => [m.name, undefined]));
+      const lastKnownValues: { [key: string]: number | undefined } = Object.fromEntries(metrics.map(m => [m.name, undefined]));
   
       WEEKS.forEach((week, index) => {
         const hasAnySelection = metrics.some(metric => metric.weeks[index]);
@@ -395,7 +411,7 @@ const LifeMetricsTracker: React.FC = () => {
                 height={80}
               />
               <YAxis />
-              <Tooltip content={(props) => <CustomTooltip {...props} isMonthly={viewMode === 'monthly'} />} />
+              <Tooltip content={(props: any) => <CustomTooltip {...props} isMonthly={viewMode === 'monthly'} />} />
               <Legend />
               {viewMode === 'single' ? (
                 <Line

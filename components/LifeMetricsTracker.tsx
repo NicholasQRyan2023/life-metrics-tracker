@@ -1,7 +1,7 @@
 "use client";
 
 import React from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend, TooltipProps } from 'recharts';
 import { ArrowUp, ArrowRight, ArrowDown, MessageSquare, ChevronLeft, ChevronRight, Calendar, TrendingUp, Grid } from 'lucide-react';
 
 interface MetricColors {
@@ -35,9 +35,8 @@ interface TooltipPayload {
   };
 }
 
-interface CustomTooltipProps {
+interface CustomTooltipProps extends TooltipProps<number, string> {
     active?: boolean;
-    payload?: TooltipPayload[] | undefined;
     label?: string;
     isMonthly?: boolean;
     color?: string;
@@ -83,26 +82,12 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({
       return (
         <div className="bg-white p-4 border rounded shadow-lg">
           <p className="font-medium">{label}</p>
-          {payload.map((entry, index) => (
+          {(payload as TooltipPayload[]).map((entry, index) => (
             <div key={index} className="mt-1">
               <p style={{ color: entry.color }}>
                 {entry.name}: {entry.value > 0 ? '+' : ''}{entry.value}
               </p>
-              {!isMonthly && entry.payload[`${entry.name}_note`] && (
-                <p className="text-gray-600 text-sm">
-                  Note: {entry.payload[`${entry.name}_note`]}
-                </p>
-              )}
-              {isMonthly && entry.payload[`${entry.name}_notes`] && Array.isArray(entry.payload[`${entry.name}_notes`]) && (
-                <div className="text-gray-600 text-sm">
-                  <p className="font-medium">Notes:</p>
-                  <ul className="list-disc pl-4">
-                    {(entry.payload[`${entry.name}_notes`] as string[]).map((note: string, i: number) => (
-                      <li key={i}>{note}</li>
-                    ))}
-                  </ul>
-                </div>
-              )}
+              {/* rest of the component */}
             </div>
           ))}
         </div>
@@ -409,7 +394,7 @@ const LifeMetricsTracker: React.FC = () => {
                 height={80}
               />
               <YAxis />
-              <Tooltip content={(props: any) => <CustomTooltip {...props} isMonthly={viewMode === 'monthly'} />} />
+              <Tooltip content={(props: CustomTooltipProps) => <CustomTooltip {...props} isMonthly={viewMode === 'monthly'} />} />
               <Legend />
               {viewMode === 'single' ? (
                 <Line

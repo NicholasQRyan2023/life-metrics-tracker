@@ -87,7 +87,21 @@ const CustomTooltip: React.FC<CustomTooltipProps> = ({
               <p style={{ color: entry.color }}>
                 {entry.name}: {entry.value > 0 ? '+' : ''}{entry.value}
               </p>
-              {/* rest of the component */}
+              {!isMonthly && entry.payload[`${entry.name}_note`] && (
+                <p className="text-gray-600 text-sm">
+                  Note: {entry.payload[`${entry.name}_note`]}
+                </p>
+              )}
+              {isMonthly && entry.payload[`${entry.name}_notes`] && Array.isArray(entry.payload[`${entry.name}_notes`]) && (
+                <div className="text-gray-600 text-sm">
+                  <p className="font-medium">Notes:</p>
+                  <ul className="list-disc pl-4">
+                    {(entry.payload[`${entry.name}_notes`] as string[]).map((note: string, i: number) => (
+                      <li key={i}>{note}</li>
+                    ))}
+                  </ul>
+                </div>
+              )}
             </div>
           ))}
         </div>

@@ -127,6 +127,12 @@ const LifeMetricsTracker: React.FC = () => {
         total: 0
       }))
     );
+    React.useEffect(() => {
+      const savedMetrics = localStorage.getItem('lifeMetrics');
+      if (savedMetrics) {
+        setMetrics(JSON.parse(savedMetrics));
+      }
+    }, []);
     
     const [selectedMetric, setSelectedMetric] = React.useState(0);
     const [editingNoteIndex, setEditingNoteIndex] = React.useState<number | null>(null);
@@ -151,6 +157,7 @@ const LifeMetricsTracker: React.FC = () => {
         }, 0);
         
         newMetrics[selectedMetric] = metric;
+        localStorage.setItem('lifeMetrics', JSON.stringify(newMetrics));  // This is the only new line
         return newMetrics;
       });
     };
@@ -161,6 +168,7 @@ const LifeMetricsTracker: React.FC = () => {
         const metric = {...newMetrics[selectedMetric]};
         metric.notes[weekIndex] = note;
         newMetrics[selectedMetric] = metric;
+        localStorage.setItem('lifeMetrics', JSON.stringify(newMetrics));  // Add this line
         return newMetrics;
       });
     };

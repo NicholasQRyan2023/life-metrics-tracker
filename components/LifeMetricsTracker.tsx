@@ -128,9 +128,11 @@ const LifeMetricsTracker: React.FC = () => {
       }))
     );
     React.useEffect(() => {
-      const savedMetrics = localStorage.getItem('lifeMetrics');
-      if (savedMetrics) {
-        setMetrics(JSON.parse(savedMetrics));
+      if (typeof window !== 'undefined') {
+        const savedMetrics = localStorage.getItem('lifeMetrics');
+        if (savedMetrics) {
+          setMetrics(JSON.parse(savedMetrics));
+        }
       }
     }, []);
     
@@ -157,7 +159,9 @@ const LifeMetricsTracker: React.FC = () => {
         }, 0);
         
         newMetrics[selectedMetric] = metric;
-        localStorage.setItem('lifeMetrics', JSON.stringify(newMetrics));  // This is the only new line
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('lifeMetrics', JSON.stringify(newMetrics));
+        }
         return newMetrics;
       });
     };
@@ -168,7 +172,9 @@ const LifeMetricsTracker: React.FC = () => {
         const metric = {...newMetrics[selectedMetric]};
         metric.notes[weekIndex] = note;
         newMetrics[selectedMetric] = metric;
-        localStorage.setItem('lifeMetrics', JSON.stringify(newMetrics));  // Add this line
+        if (typeof window !== 'undefined') {
+          localStorage.setItem('lifeMetrics', JSON.stringify(newMetrics));
+        }
         return newMetrics;
       });
     };

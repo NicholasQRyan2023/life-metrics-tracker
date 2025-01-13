@@ -118,21 +118,15 @@ interface Metric {
   total: number;
 }
 const LifeMetricsTracker: React.FC = () => {
-  const [metrics, setMetrics] = React.useState<Metric[]>(() => {
-    if (typeof window !== 'undefined') {
-      const savedMetrics = localStorage.getItem('lifeMetrics');
-      if (savedMetrics) {
-        return JSON.parse(savedMetrics);
-      }
-    }
-    return Object.keys(METRIC_COLORS).map(name => ({
-      name,
-      color: METRIC_COLORS[name],
-      weeks: Array(52).fill(null),
-      notes: Array(52).fill(''),
-      total: 0
-    }));
-  });
+    const [metrics, setMetrics] = React.useState<Metric[]>(
+      Object.keys(METRIC_COLORS).map(name => ({
+        name,
+        color: METRIC_COLORS[name],
+        weeks: Array(52).fill(null),
+        notes: Array(52).fill(''),
+        total: 0
+      }))
+    );
     
     const [selectedMetric, setSelectedMetric] = React.useState(0);
     const [editingNoteIndex, setEditingNoteIndex] = React.useState<number | null>(null);
@@ -157,9 +151,6 @@ const LifeMetricsTracker: React.FC = () => {
         }, 0);
         
         newMetrics[selectedMetric] = metric;
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('lifeMetrics', JSON.stringify(newMetrics));
-        }
         return newMetrics;
       });
     };
@@ -170,9 +161,6 @@ const LifeMetricsTracker: React.FC = () => {
         const metric = {...newMetrics[selectedMetric]};
         metric.notes[weekIndex] = note;
         newMetrics[selectedMetric] = metric;
-        if (typeof window !== 'undefined') {
-          localStorage.setItem('lifeMetrics', JSON.stringify(newMetrics));
-        }
         return newMetrics;
       });
     };

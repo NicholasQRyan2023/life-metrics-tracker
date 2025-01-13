@@ -118,25 +118,27 @@ interface Metric {
   total: number;
 }
 const LifeMetricsTracker: React.FC = () => {
-  const [metrics, setMetrics] = React.useState<Metric[]>(() => {
-    if (typeof window !== 'undefined') {
-      const savedMetrics = localStorage.getItem('lifeMetrics');
-      console.log("Initial load - saved metrics:", savedMetrics); // Debug log
-      if (savedMetrics) {
-        const parsed = JSON.parse(savedMetrics);
-        console.log("Parsed metrics:", parsed); // Debug log
-        return parsed;
-      }
-    }
-    console.log("Falling back to default metrics"); // Debug log
-    return Object.keys(METRIC_COLORS).map(name => ({
+  const [metrics, setMetrics] = React.useState<Metric[]>(
+    Object.keys(METRIC_COLORS).map(name => ({
       name,
       color: METRIC_COLORS[name],
       weeks: Array(52).fill(null),
       notes: Array(52).fill(''),
       total: 0
-    }));
-  });
+    }))
+  );
+  
+  React.useEffect(() => {
+    const savedMetrics = localStorage.getItem('lifeMetrics');
+    if (savedMetrics) {
+      try {
+        const parsed = JSON.parse(savedMetrics);
+        setMetrics(parsed);
+      } catch (e) {
+        console.error('Error loading saved metrics:', e);
+      }
+    }
+  }, []);
     
     const [selectedMetric, setSelectedMetric] = React.useState(0);
     const [editingNoteIndex, setEditingNoteIndex] = React.useState<number | null>(null);

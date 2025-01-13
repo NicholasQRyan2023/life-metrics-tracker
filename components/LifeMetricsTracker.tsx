@@ -163,6 +163,7 @@ const LifeMetricsTracker: React.FC = () => {
         newMetrics[selectedMetric] = metric;
         if (typeof window !== 'undefined') {
           localStorage.setItem('lifeMetrics', JSON.stringify(newMetrics));
+          console.log("Saving metrics:", newMetrics); // Add this line
         }
         return newMetrics;
       });

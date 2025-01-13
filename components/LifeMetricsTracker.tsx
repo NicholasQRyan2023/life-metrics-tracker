@@ -121,10 +121,14 @@ const LifeMetricsTracker: React.FC = () => {
   const [metrics, setMetrics] = React.useState<Metric[]>(() => {
     if (typeof window !== 'undefined') {
       const savedMetrics = localStorage.getItem('lifeMetrics');
+      console.log("Initial load - saved metrics:", savedMetrics); // Debug log
       if (savedMetrics) {
-        return JSON.parse(savedMetrics);
+        const parsed = JSON.parse(savedMetrics);
+        console.log("Parsed metrics:", parsed); // Debug log
+        return parsed;
       }
     }
+    console.log("Falling back to default metrics"); // Debug log
     return Object.keys(METRIC_COLORS).map(name => ({
       name,
       color: METRIC_COLORS[name],
